@@ -39,7 +39,7 @@ Just some hacks to deep-daze to include:
 ## Install
 
 ```bash
-$ pip install -e git+git://github.com/nerdyrodent/deep-daze
+$ pip install git+https://github.com/nerdyrodent/deep-daze
 ```  
 
 ## Example usage
@@ -170,6 +170,21 @@ FLAGS
         Default: 1
         Strength of second image
 ```
+
+### Optimisers
+
+Different optimisers work better with different learning rates. Some suggested maximums are shown below:
+
+Adadelta	= 0.025
+Adagrad     = 0.0005
+AdaBelief	= 0.00005
+AdamP	    = 0.00005
+AdamW	    = 0.00005
+Adamax	    = 0.00005
+DiffGrad    = 0.00005
+Yogi        = 0.00003
+SWATS       = 0.0001
+NovoGrad    = 0.0005
 
 ### Priming
 

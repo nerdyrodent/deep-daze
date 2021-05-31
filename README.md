@@ -20,7 +20,7 @@ This will require that you have an Nvidia GPU or AMD GPU, as well as Python
 | ------------- | ------------- |
 | <img src="./samples/60s_style_art_decor_room.jpg" width="256px"></img>  | 60s style art decor room |
 | <img src="./samples/A_bright_colourful_painting_of_the_love_I_feel_v2.jpg" width="256px"></img>  | A bright colourful painting of the love I feel |
-| <img src="./samples/A_cat's_face_on_the_side_of_a_mug_on_a_computer_table.jpg" width="256px"></img>  | A cat's face on the side of a mug on a computer_table |
+| <img src="./samples/A_cat's_face_on_the_side_of_a_mug_on_a_computer_table.jpg" width="256px"></img>  | A cat's face on the side of a mug on a computer table |
 | <img src="./samples/A_comic_art_styled_rock_with_a_tree_growing_out_of_it_v0b.jpg" width="256px"></img>  | A comic art styled rock with a tree growing out of it |
 | <img src="./samples/A_painting_of_a_mermaid_building_a_weirdly_surreal_artistic_table.jpg" width="256px"></img>  | A painting of a mermaid building a weirdly surreal artistic table |
 | <img src="./samples/A_portrait_of_lady_with_putas_with_a_glove_on_her_hand_plate_60_no_78.jpg" width="256px"></img>  | A portrait of lady with putas with a glove on her hand plate 60 no 78 |
@@ -43,6 +43,8 @@ $ pip install git+https://github.com/nerdyrodent/deep-daze
 ```  
 
 ## Example usage
+
+### Basic
 
 ```bash
 $ imagine "a rodent using a computer"

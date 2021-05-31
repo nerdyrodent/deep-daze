@@ -37,32 +37,13 @@ $ pip install deep-daze
 ## Example usage
 
 ```bash
-$ imagine "a house in the forest"
-```
-For Windows:
-
-<img src="./instruction_images/Windows/Step_2_DD_Win.png" width="480px"></img>
-
-- Open command prompt as administrator
-```bash
-  imagine "a house in the forest"
-```
-
-That's it.
-
-
-If you have enough memory, you can get better quality by adding a `--deeper` flag
-
-```bash
-$ imagine "shattered plates on the ground" --deeper
+$ imagine "a rodent using a computer"
 ```
 
 ### Advanced
 
-In true deep learning fashion, more layers will yield better results. Default is at `16`, but can be increased to `32` depending on your resources.
-
 ```bash
-$ imagine "stranger in strange lands" --num-layers 32
+$ dream "A painting on the floor of my bedroom" --lr=0.06 --epochs=2 --iterations=650 --save_every=10 --random --open_folder=False --save_progress
 ```
 
 ## Usage
@@ -165,6 +146,21 @@ FLAGS
     --save_gif=SAVE_GIF
         Default: False
         Whether or not to save a GIF animation of the generation procedure. Only works if save_progress is set to True.
+    --optimizer=OPTIMIZER
+        Default: AdamP
+        Available optimiser options: AdamP, Adam, DiffGrad, Adagrad, AdamW, Adamax, Adadelta, AdaBelief, Yogi, NovoGrad, Shampoo (slow), SWATS
+    --img2=IMAGE_PATH
+        Default: None
+        Path to second png/jpg image or PIL image to optimize on
+    --text_str=STRENGTH
+        Default: 1
+        Strength of text
+    --img_str=STRENGTH
+        Default: 1
+        Strength of first image
+    --img2_strSTRENGTH
+        Default: 1
+        Strength of second image
 ```
 
 ### Priming

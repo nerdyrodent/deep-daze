@@ -26,12 +26,20 @@ New simplified notebook [![Open In Colab][colab-badge]][colab-notebook-2]
 
 This will require that you have an Nvidia GPU or AMD GPU, as well as Python
 - Recommended: 16GB VRAM
-- Minimum Requirements: 4GB VRAM (Using VERY LOW settings, see usage instructions below) 
+- Minimum Requirements: 4GB VRAM (Using VERY LOW settings, see usage instructions below)
+
+## What is in this fork?
+
+Just some hacks to deep-daze to include:
+* A range of optimisers
+* Stories can now include images, rather just just pure text
+* A second image can be specified
+* All encodings (text, img, img2) have strength options
 
 ## Install
 
 ```bash
-$ pip install deep-daze
+$ pip install -e git+git://github.com/nerdyrodent/deep-daze
 ```  
 
 ## Example usage

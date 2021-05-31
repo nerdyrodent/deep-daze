@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from siren_pytorch import SirenNet, SirenWrapper
 from torch import nn
 from torch.cuda.amp import GradScaler, autocast
-from torch_optimizer import DiffGrad, AdamP
+from torch_optimizer import DiffGrad, AdamP, AdaBelief, Yogi, NovoGrad, Shampoo, SWATS
 import numpy as np
 
 from PIL import Image
@@ -21,6 +21,9 @@ import torchvision.transforms as T
 from tqdm import trange, tqdm
 
 from .clip import load, tokenize
+
+# Autotune can improve performance
+torch.backends.cudnn.benchmark = True
 
 
 # Helpers
@@ -34,7 +37,7 @@ def default(val, d):
 
 
 def interpolate(image, size):
-    return F.interpolate(image, (size, size), mode='bilinear', align_corners=False)
+    return F.interpolate(image, (size, size), mode='bicubic', align_corners=False)
 
 
 def rand_cutout(image, size, center_bias=False, center_focus=2):
@@ -99,12 +102,12 @@ def norm_siren_output(img):
     return ((img + 1) * 0.5).clamp(0.0, 1.0)
 
 
-def create_text_path(context_length, text=None, img=None, encoding=None, separator=None):
+def create_text_path(context_length, text=None, img=None, theta_init=None, optim=None, encoding=None, separator=None):
     if text is not None:
         if separator is not None and separator in text:
             #Reduces filename to first epoch text
             text = text[:text.index(separator, )]
-        input_name = text.replace(" ", "_")[:context_length]
+        input_name = text.replace(" ", "_")[:context_length] + "--Theta-" + str(theta_init) + "--" + optim
     elif img is not None:
         if isinstance(img, str):
             input_name = "".join(img.replace(" ", "_").split(".")[:-1])
@@ -249,6 +252,10 @@ class Imagine(nn.Module):
             *,
             text=None,
             img=None,
+            img2=None,
+            text_str=1,
+            img_str=1,
+            img2_str=1,
             clip_encoding=None,
             lr=1e-5,
             batch_size=4,
@@ -376,12 +383,36 @@ class Imagine(nn.Module):
         self.model = model
         self.scaler = GradScaler()
         siren_params = model.model.parameters()
+
+        # NR: Hax
+        self.lr = lr
+
         if optimizer == "AdamP":
             self.optimizer = AdamP(siren_params, lr)
         elif optimizer == "Adam":
             self.optimizer = torch.optim.Adam(siren_params, lr)
         elif optimizer == "DiffGrad":
             self.optimizer = DiffGrad(siren_params, lr)
+        elif optimizer == "Adagrad":
+            self.optimizer = torch.optim.Adagrad(siren_params, lr)
+        elif optimizer == "AdamW":
+            self.optimizer = torch.optim.AdamW(siren_params, lr)
+        elif optimizer == "Adamax":
+            self.optimizer = torch.optim.Adamax(siren_params, lr)
+        elif optimizer == "Adadelta":
+            self.optimizer = torch.optim.Adadelta(siren_params, lr)
+        elif optimizer == "AdaBelief":
+            self.optimizer = AdaBelief(siren_params, lr)
+        elif optimizer == "Yogi":
+            self.optimizer = Yogi(siren_params, lr)
+        elif optimizer == "NovoGrad":
+            self.optimizer = NovoGrad(siren_params, lr)
+        elif optimizer == "Shampoo":
+            self.optimizer = Shampoo(siren_params, lr)
+        elif optimizer == "SWATS":
+            self.optimizer = SWATS(siren_params, lr)            
+
+            
         self.gradient_accumulate_every = gradient_accumulate_every
         self.save_every = save_every
         self.save_date_time = save_date_time
@@ -389,11 +420,16 @@ class Imagine(nn.Module):
         self.save_progress = save_progress
         self.text = text
         self.image = img
-        self.textpath = create_text_path(self.perceptor.context_length, text=text, img=img, encoding=clip_encoding, separator=story_separator)
+        self.img2 = img2
+        self.text_str = text_str
+        self.img_str = img_str
+        self.img2_str = img2_str
+        self.textpath = create_text_path(self.perceptor.context_length, text=text, img=img, theta_init=theta_initial, optim=optimizer, encoding=clip_encoding, separator=story_separator)
         self.filename = self.image_output_path()
         
         # create coding to optimize for
-        self.clip_encoding = self.create_clip_encoding(text=text, img=img, encoding=clip_encoding)
+        # NR: Updated
+        self.clip_encoding = self.create_clip_encoding(text=text, text_str=text_str, img=img, img2=img2, img_str=img_str, img2_str=img2_str, encoding=clip_encoding)
 
         self.start_image = None
         self.start_image_train_iters = start_image_train_iters
@@ -411,15 +447,22 @@ class Imagine(nn.Module):
         self.save_gif = save_gif
         self.save_video = save_video
             
-    def create_clip_encoding(self, text=None, img=None, encoding=None):
+    def create_clip_encoding(self, text=None, text_str=1, img=None, img2=None, img_str=1, img2_str=1, encoding=None):
+        # NR: Test with 2 sets of text, as well as 2 sets of images. All with weights, of course!
         self.text = text
         self.img = img
+        self.img2 = img2
+        self.text_str = text_str
+        self.img_str = img_str
+        self.img2_str = img2_str        
         if encoding is not None:
             encoding = encoding.to(self.device)
         elif self.create_story:
             encoding = self.update_story_encoding(epoch=0, iteration=1)
+        elif text is not None and img is not None and img2 is not None:
+            encoding = ((self.create_text_encoding(text) * text_str) + (self.create_img_encoding(img) * img_str) + (self.create_img_encoding(img2) * img2_str)) / 3 # NR: 2 images
         elif text is not None and img is not None:
-            encoding = (self.create_text_encoding(text) + self.create_img_encoding(img)) / 2
+            encoding = ((self.create_text_encoding(text) * text_str) + (self.create_img_encoding(img) * img_str)) / 2 # NR: Weights
         elif text is not None:
             encoding = self.create_text_encoding(text)
         elif img is not None:
@@ -440,6 +483,7 @@ class Imagine(nn.Module):
             img_encoding = self.perceptor.encode_image(normed_img).detach()
         return img_encoding
     
+    # never used?
     def set_clip_encoding(self, text=None, img=None, encoding=None):
         encoding = self.create_clip_encoding(text=text, img=img, encoding=encoding)
         self.clip_encoding = encoding.to(self.device)
@@ -478,7 +522,12 @@ class Imagine(nn.Module):
         with open("story_transitions.txt", "a") as f:
             f.write(f"{epoch}, {sequence_number}, {self.words}\n")
         
-        encoding = self.create_text_encoding(self.words)
+        # NR: If using img, also add the weighted version (doesn't support 2 images yet)
+        if self.img is None:
+            encoding = self.create_text_encoding(self.words)
+        else:
+            encoding = ((self.create_text_encoding(self.words) * self.text_str) + (self.create_img_encoding(self.img) * self.img_str)) / 2 # NR: Weights? 2 0.8 seems quite good!
+            
         return encoding
 
     def image_output_path(self, sequence_number=None):
@@ -542,7 +591,7 @@ class Imagine(nn.Module):
                 images.append(imread(os.path.join('./', file_name)))
 
         if self.save_video:
-            mimsave(f'{self.textpath}.mp4', images)
+            mimsave(f'{self.textpath}.mp4', images, fps=60)
             print(f'Generated image generation animation at ./{self.textpath}.mp4')
         if self.save_gif:
             mimsave(f'{self.textpath}.gif', images)
@@ -576,6 +625,27 @@ class Imagine(nn.Module):
         if self.open_folder:
             open_folder('./')
             self.open_folder = False
+        
+        
+        #NR: Hax: Test one - higher LR initial run
+        print("Priming with higher LR...")
+        init_iterations = 8       # 50
+        init_lr = self.lr * 2       # 4.25, LR=0.0000355
+        
+        for nr in self.optimizer.param_groups:
+          nr['lr'] = init_lr
+          
+        init_iters=trange(init_iterations, desc='iteration')
+        for i in init_iters:
+            _, loss = self.train_step(0, i)
+            init_iters.set_description(f'loss: {loss.item():.2f}')     
+
+        # NR: Reset lr
+        for nr in self.optimizer.param_groups:
+          nr['lr'] = self.lr
+
+        print("Normal run...")
+        
 
         try:
             for epoch in trange(self.epochs, desc='epochs'):
@@ -587,11 +657,17 @@ class Imagine(nn.Module):
                 # Update clip_encoding per epoch if we are creating a story
                 if self.create_story:
                     self.clip_encoding = self.update_story_encoding(epoch, i)
+                
+                # NR: Hax - lr change each epoch
+                #self.lr = self.lr * 0.985
+                #for nr in self.optimizer.param_groups:
+                # nr['lr'] = self.lr
+
         except KeyboardInterrupt:
             print('interrupted by keyboard, gracefully exiting')
             return
 
-        self.save_image(epoch, i) # one final save at end
+        self.save_image(epoch+1, i) # one final save at end
 
         if (self.save_gif or self.save_video) and self.save_progress:
             self.generate_gif()

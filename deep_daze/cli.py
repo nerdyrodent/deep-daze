@@ -8,6 +8,10 @@ from deep_daze import Imagine
 def train(
         text=None,
         img=None,
+        img2=None,
+        text_str=1,
+        img_str=1,
+        img2_str=1,
         learning_rate=1e-5,
         num_layers=16,
         hidden_size=256,
@@ -49,7 +53,7 @@ def train(
         optimizer="AdamP"
 ):
     """
-    :param text: (required) A phrase less than 77 tokens which you would like to visualize.
+    :param text: (required) A phrase less than 77 characters which you would like to visualize.
     :param img: The path to a jpg or png image which you would like to imagine. Can be combined with text.
     :param learning_rate: The learning rate of the neural net.
     :param hidden_size: The hidden layer size of the Siren net.
@@ -74,7 +78,7 @@ def train(
     :param upper_bound_cutout: The upper bound for the cutouts used in generation.
     :param lower_bound_cutout: The lower bound for the cutouts used in generation.
     :param saturate_bound: If True, the LOWER_BOUND_CUTOUT is linearly increased to 0.75 during training.
-    :param create_story: Creates a story by optimizing each epoch on a new sliding-window of the input words. If this is enabled, much longer texts than 77 tokens can be used. Requires save_progress to visualize the transitions of the story.
+    :param create_story: Creates a story by optimizing each epoch on a new sliding-window of the input words. If this is enabled, much longer texts than 77 chars can be used. Requires save_progress to visualize the transitions of the story.
     :param story_start_words: Only used if create_story is True. How many words to optimize on for the first epoch.
     :param story_words_per_epoch: Only used if create_story is True. How many words to add to the optimization goal per epoch after the first one.
     :param story_separator: Only used if create_story is True. Defines a separator like '.' that splits the text into groups for each epoch. Separator needs to be in the text otherwise it will be ignored!
@@ -99,6 +103,10 @@ def train(
     imagine = Imagine(
         text=text,
         img=img,
+        img2=img2,
+        text_str=text_str,
+        img_str=img_str,
+        img2_str=img2_str,
         lr=learning_rate,
         num_layers=num_layers,
         batch_size=batch_size,

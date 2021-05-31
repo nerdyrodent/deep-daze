@@ -51,7 +51,7 @@ $ imagine "a rodent using a computer"
 ### Advanced
 
 ```bash
-$ dream "A painting on the floor of my bedroom" --lr=0.06 --epochs=2 --iterations=650 --save_every=10 --random --open_folder=False --save_progress
+$ imagine "A castle in the sky" --epochs=2 --iterations=512 --save_every=5122 --save_progress --open_folder=False --batch_size=8 --num-layers 24
 ```
 
 ## Usage

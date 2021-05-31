@@ -1,36 +1,16 @@
 ## Deep Daze
 
-<img src="./samples/Mist_over_green_hills.jpg" width="256px"></img>
-
-*mist over green hills*
-
-<img src="./samples/Shattered_plates_on_the_grass.jpg" width="256px"></img>
-
-*shattered plates on the grass*
-
-<img src="./samples/Cosmic_love_and_attention.jpg" width="256px"></img>
-
-*cosmic love and attention*
-
-<img src="./samples/A_time_traveler_in_the_crowd.jpg" width="256px"></img>
-
-*a time traveler in the crowd*
-
-<img src="./samples/Life_during_the_plague.jpg" width="256px"></img>
-
-*life during the plague*
-
-<img src="./samples/Meditative_peace_in_a_sunlit_forest.jpg" width="256px"></img>
-
-*meditative peace in a sunlit forest*
-
-<img src="./samples/A_man_painting_a_completely_red_image.png" width="256px"></img>
-
-*a man painting a completely red image*
-
-<img src="./samples/A_psychedelic_experience_on_LSD.png" width="256px"></img>
-
-*a psychedelic experience on LSD*
+| Sample Image  | Sample Text   |
+| ------------- | ------------- |
+| <img src="./samples/60s_style_art_decor_room.jpg" width="256px"></img>  | 60s style art decor room |
+| <img src="./samples/A_bright_colourful_painting_of_the_love_I_feel_v2.jpg" width="256px"></img>  | A bright colourful painting of the love I feel |
+| <img src="./samples/A_cat's_face_on_the_side_of_a_mug_on_a_computer_table.jpg" width="256px"></img>  | A cat's face on the side of a mug on a computer_table |
+| <img src="./samples/A_comic_art_styled_rock_with_a_tree_growing_out_of_it_v0b.jpg" width="256px"></img>  | A comic art styled rock with a tree growing out of it |
+| <img src="./samples/A_painting_of_a_mermaid_building_a_weirdly_surreal_artistic_table.jpg" width="256px"></img>  | A painting of a mermaid building a weirdly surreal artistic table |
+| <img src="./samples/A_portrait_of_lady_with_putas_with_a_glove_on_her_hand_plate_60_no_78.jpg" width="256px"></img>  | A portrait of lady with putas with a glove on her hand plate 60 no 78 |
+| <img src="./samples/A_surreal_painting_of_a_psychedelic_snake_you_create_online.jpg" width="256px"></img>  | A surreal painting of a psychedelic snake you create online  |
+| <img src="./samples/A_vector_art_portrait_painting_of_the_character._Give_him_a_neck_tattoo--Adadelta.jpg" width="256px"></img>  | A vector art portrait painting of the character. Give him a neck tattoo  | 
+| <img src="./samples/This_portrait_was_painted_by_Walter_Lasker,_who_died_in_New_York_in_1927.jpg" width="256px"></img>  | This portrait was painted by Walter Lasker who died in New York in 1927  | 
 
 ## What is this?
 
@@ -44,7 +24,7 @@ New simplified notebook [![Open In Colab][colab-badge]][colab-notebook-2]
 [colab-notebook-2]: <https://colab.research.google.com/drive/1_YOHdORb0Fg1Q7vWZ_KlrtFe9Ur3pmVj?usp=sharing>
 [colab-badge]: <https://colab.research.google.com/assets/colab-badge.svg>
 
-This will require that you have an Nvidia GPU or AMD GPU
+This will require that you have an Nvidia GPU or AMD GPU, as well as Python
 - Recommended: 16GB VRAM
 - Minimum Requirements: 4GB VRAM (Using VERY LOW settings, see usage instructions below) 
 
@@ -54,17 +34,7 @@ This will require that you have an Nvidia GPU or AMD GPU
 $ pip install deep-daze
 ```  
 
-### Windows Install
-
-<img src="./instruction_images/Windows/Step_1_DD_Win.png" width="480px"></img>
-
-Presuming Python is installed: 
-- Open command prompt and navigate to the directory of your current version of Python
-```bash
-  pip install deep-daze
-```
-
-## Examples
+## Example usage
 
 ```bash
 $ imagine "a house in the forest"

@@ -157,16 +157,16 @@ FLAGS
     --optimizer=OPTIMIZER
         Default: AdamP
         Available optimiser options: AdamP, Adam, DiffGrad, Adagrad, AdamW, Adamax, Adadelta, AdaBelief, Yogi, NovoGrad, Shampoo (slow), SWATS
-    --img2=IMAGE_PATH
+    --img2
         Default: None
         Path to second png/jpg image or PIL image to optimize on
-    --text_str=STRENGTH
+    --text_str
         Default: 1
         Strength of text
-    --img_str=STRENGTH
+    --img_str
         Default: 1
         Strength of first image
-    --img2_strSTRENGTH
+    --img2_str
         Default: 1
         Strength of second image
 ```
